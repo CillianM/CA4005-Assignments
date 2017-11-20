@@ -24,7 +24,7 @@ public class ElGamal {
         BigInteger secretKey = new BigInteger(PRIME_MODULUS.bitLength(), new Random());
         BigInteger publicKey = GENERATOR.modPow(secretKey, PRIME_MODULUS);
 
-        BigInteger m;
+        BigInteger m = BigInteger.ZERO;
         try {
             BigInteger s = BigInteger.ZERO;
             BigInteger r = BigInteger.ZERO;
@@ -48,8 +48,11 @@ public class ElGamal {
                 //If s=0 start over again
             }
             System.out.println("Public Key: " + publicKey.toString(16));
+            System.out.println("Private Key: " + secretKey.toString(16));
             System.out.println("R: " + r.toString(16));
             System.out.println("S: " + s.toString(16));
+            System.out.println("File: " + byteToHex(file));
+            System.out.println("Hashed File: " + m.toString(16));
 
             if(verify(PRIME_MODULUS,GENERATOR,publicKey,r,s,file)){
                 System.out.println("Verified!");
@@ -68,7 +71,7 @@ public class ElGamal {
     private static boolean verify(BigInteger p,BigInteger g, BigInteger y,BigInteger r,BigInteger s,byte [] m){
 
         //check that 0 < r < p and 0 < s < p-1
-        if((r.compareTo(BigInteger.ZERO)!=1)||(r.compareTo(p)!=-1)||(s.compareTo(BigInteger.ZERO)!=1)||(s.compareTo(p.subtract(BigInteger.ONE))!=-1)){
+        if((1 != r.compareTo(BigInteger.ZERO))||(-1 != r.compareTo(p))||(1 != s.compareTo(BigInteger.ZERO))||(-1 != s.compareTo(p.subtract(BigInteger.ONE)))){
             return false;
         }
         // generate the 256-bit digest H(m)
@@ -146,5 +149,13 @@ public class ElGamal {
             e1.printStackTrace();
         }
         return fileArray;
+    }
+
+    private static String byteToHex(byte[] array) {
+        StringBuilder builder = new StringBuilder();
+        for (byte b : array) {
+            builder.append(String.format("%02x", b));
+        }
+        return builder.toString();
     }
 }
